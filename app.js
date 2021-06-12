@@ -22,7 +22,7 @@ db()
 
 app.use(
     cors({
-        origin: process.env.APP_URL
+        origin: 'http://localhost:3000'
     })
 )
 
