@@ -39,7 +39,7 @@
         "validator": "^13.6.0"
     },
     "scripts": {
-        "start": "forever ./bin/www",
+        "start": "nodemon ./bin/www",
         "test": ""
     }
 }

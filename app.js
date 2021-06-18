@@ -3,7 +3,7 @@ const express = require('express')
 const logger = require('morgan')
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
-const expressJwt = require('express-jwt')
+const jwt = require('express-jwt')
 const { connectToDatabase } = require('./config/db.config')
 
 const jwtSecret = process.env.JWT_SECRET
@@ -34,15 +34,24 @@ app.use(express.json())
 app.use(cookieParser())
 app.use(express.urlencoded({ extended: false }))
 app.use(
-    expressJwt({
+    jwt({
         secret: jwtSecret,
         algorithms: ['HS256'],
-        credentialsRequired: false
+        credentialsRequired: false,
+        getToken: function fromHeaderOrQuerystring(req) {
+            if (
+                req.headers.authorization &&
+                req.headers.authorization.split(' ')[0] === 'Bearer'
+            ) {
+                return req.headers.authorization.split(' ')[1]
+            } else if (req.query && req.query.token) {
+                return req.query.token
+            }
+            return null
+        }
     }).unless({
         path: [
-            { url: '/', method: 'GET' },
             { url: '/api/', method: 'GET' },
-            { url: '/api/posts', method: 'GET' },
             { url: '/api/posts/:postId', method: 'GET' },
             { url: '/api/users/register', method: 'POST' },
             { url: '/api/users/login', method: 'POST' },
