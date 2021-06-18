@@ -7,6 +7,7 @@ const { TokenExpiredError } = jwt
 
 const jwtSecret = process.env.JWT_SECRET
 const jwtExp = Number(process.env.JWT_EXP)
+const jwtRefreshExp = Number(process.env.JWT_REFRESH_EXP)
 const appUrl = process.env.APP_URL
 const bcryptSalt = Number(process.env.BCRYPT_SALT)
 
@@ -63,6 +64,8 @@ exports.register = async (req, res) => {
 }
 
 exports.login = async (req, res) => {
+    const requestToken = req.cookies.refreshToken
+
     await req.db.User.findOne({
         username: req.body.username
     })
@@ -102,6 +105,12 @@ exports.login = async (req, res) => {
                 }
             )
 
+            if (requestToken) {
+                await req.db.RefreshToken.findOneAndRemove({
+                    refreshToken: requestToken
+                })
+            }
+
             let refreshToken = await req.db.RefreshToken.createToken(
                 user._id,
                 user.username,
@@ -111,6 +120,10 @@ exports.login = async (req, res) => {
 
             let authority = `ROLE_${user.role.name}`.toUpperCase()
 
+            res.cookie('refreshToken', refreshToken, {
+                httpOnly: true
+            })
+
             res.status(200).send({
                 _id: user._id,
                 username: user.username,
@@ -118,16 +131,36 @@ exports.login = async (req, res) => {
                 favoritePosts: user.favoritePosts,
                 role: authority,
                 accessToken,
-                refreshToken
+                jwtExp
             })
-            return
         })
+}
+
+exports.logout = async (req, res) => {
+    const requestToken = req.cookies.refreshToken
+
+    if (!requestToken) {
+        res.status(400).send({
+            message: 'Not logged in'
+        })
+        return
+    }
+
+    await req.db.RefreshToken.findOneAndRemove({
+        refreshToken: requestToken
+    })
+
+    res.clearCookie('refreshToken')
+
+    res.status(200).send({
+        message: 'logout successful!'
+    })
 }
 
 exports.getUser = async (req, res) => {
     const { userId } = req.params
 
-    await req.db.User.findById(userId, '-password -__v')
+    await req.db.User.findById(req.user._id, '-password -__v')
         .populate('role', '-__v')
         .then(user => {
             if (!user) {
@@ -200,7 +233,7 @@ exports.deleteUser = async (req, res) => {
 }
 
 exports.refreshToken = async (req, res) => {
-    const { refreshToken: requestToken } = req.body
+    const requestToken = req.cookies.refreshToken
 
     if (!requestToken) {
         res.status(403).send({
@@ -225,7 +258,7 @@ exports.refreshToken = async (req, res) => {
         if (err) {
             if (!(err instanceof TokenExpiredError)) {
                 await req.db.RefreshToken.deleteMany({
-                    userId: tokenObj.userId
+                    accessToken: tokenObj.accessToken
                 })
                 res.status(401).send({
                     message: 'Unauthorized access, login'
@@ -234,15 +267,15 @@ exports.refreshToken = async (req, res) => {
             }
         }
 
-        if (decoded) {
-            await req.db.RefreshToken.deleteMany({
-                userId: tokenObj.userId
-            })
-            res.status(401).send({
-                message: 'Unauthorized access, login'
-            })
-            return
-        }
+        // if (decoded) {
+        //     await req.db.RefreshToken.deleteMany({
+        //         accessToken: tokenObj.accessToken
+        //     })
+        //     res.status(401).send({
+        //         message: 'Unauthorized access, login'
+        //     })
+        //     return
+        // }
         toSendToken = true
     })
 
@@ -263,7 +296,7 @@ exports.refreshToken = async (req, res) => {
 
         res.status(200).send({
             accessToken: newAccessToken,
-            refreshToken: tokenObj.refreshToken
+            jwtExp
         })
     }
 }

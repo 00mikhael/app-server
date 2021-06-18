@@ -4,6 +4,7 @@ const sendEmail = require('../utils/email/sendEmail')
 
 const jwtSecret = process.env.JWT_SECRET
 const jwtExp = Number(process.env.JWT_EXP)
+const jwtRefreshExp = Number(process.env.JWT_REFRESH_EXP)
 const bcryptSalt = Number(process.env.BCRYPT_SALT)
 
 exports.register = async (req, res) => {
@@ -94,6 +95,8 @@ exports.register = async (req, res) => {
 }
 
 exports.login = async (req, res) => {
+    const requestToken = req.cookies.refreshToken
+
     await req.db.User.findOne({
         username: req.body.username
     })
@@ -140,6 +143,12 @@ exports.login = async (req, res) => {
                 }
             )
 
+            if (requestToken) {
+                await req.db.RefreshToken.findOneAndRemove({
+                    refreshToken: requestToken
+                })
+            }
+
             let refreshToken = await req.db.RefreshToken.createToken(
                 user._id,
                 user.username,
@@ -149,6 +158,10 @@ exports.login = async (req, res) => {
 
             let authority = `ROLE_${user.role.name}`.toUpperCase()
 
+            res.cookie('refreshToken', refreshToken, {
+                httpOnly: true
+            })
+
             res.status(200).send({
                 _id: user._id,
                 username: user.username,
@@ -156,7 +169,7 @@ exports.login = async (req, res) => {
                 favoritePosts: user.favoritePosts,
                 role: authority,
                 accessToken,
-                refreshToken
+                jwtExp
             })
             return
         })

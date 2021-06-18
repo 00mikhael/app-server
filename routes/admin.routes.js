@@ -7,7 +7,6 @@ const userController = require('../controllers/user.controller')
 router.post(
     '/register',
     [
-        auth.verifyToken,
         auth.isAdmin,
         userValidator.checkRegisterDetails,
         userValidator.checkUserExist,
@@ -16,7 +15,9 @@ router.post(
     adminController.register
 )
 
-router.post('/login', [userValidator.checkLoginDetails], adminController.login)
+router.post('/login', [userValidator.checkLoginDetails], userController.login)
+
+router.post('/logout', userController.logout)
 
 router.post('/refreshToken', userController.refreshToken)
 
@@ -30,21 +31,17 @@ router.post('/resetPassword', userController.resetPassword)
 
 router.post('/cancelPasswordReset', userController.cancelPasswordReset)
 
-router.get(
-    '/all/users',
-    [auth.verifyToken, auth.isAdmin],
-    adminController.findAll
-)
+router.get('/all/users', [auth.isAdmin], adminController.findAll)
 
 router.get(
-    '/:userId',
-    [auth.verifyToken, auth.isAdmin, userValidator.checkFindUserDetails],
+    '/user',
+    [auth.isAdmin, userValidator.checkFindUserDetails],
     userController.getUser
 )
 
 router.delete(
     '/:userId',
-    [auth.verifyToken, userValidator.checkFindUserDetails],
+    [userValidator.checkFindUserDetails],
     userController.deleteUser
 )
 

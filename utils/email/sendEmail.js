@@ -4,14 +4,19 @@ const fs = require('fs')
 const path = require('path')
 
 const sendEmail = async (email, subject, payload, template) => {
+    const emailUser = process.env.EMAIL_USERNAME
+    const emailPass = process.env.EMAIL_PASSWORD
+    const fromEmail = process.env.FROM_EMAIL
+    const emailHost = process.env.EMAIL_HOST
+
     try {
         // create reusable transporter object using the default SMTP transport
         const transporter = nodemailer.createTransport({
-            host: process.env.EMAIL_HOST,
+            host: emailHost,
             port: 465,
             auth: {
-                user: process.env.EMAIL_USERNAME,
-                pass: process.env.EMAIL_PASSWORD
+                user: emailUser,
+                pass: emailPass
             }
         })
 
@@ -19,7 +24,7 @@ const sendEmail = async (email, subject, payload, template) => {
         const compiledTemplate = handlebars.compile(source)
         const options = () => {
             return {
-                from: process.env.FROM_EMAIL,
+                from: fromEmail,
                 to: email,
                 subject: subject,
                 html: compiledTemplate(payload)

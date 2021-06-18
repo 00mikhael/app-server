@@ -18,11 +18,8 @@ const checkCreateDetails = async (req, res, next) => {
 const checkFindAllDetails = async (req, res, next) => {
     const { userId } = req.params
 
-    console.log('USER ID ', userId)
-    console.log('REQ USER ID ', req.userId)
-
     let isOwner = false
-    if (userId === req.userId) {
+    if (userId === req.user._id) {
         isOwner = true
     }
 
@@ -83,7 +80,7 @@ const checkDeleteAllDetails = async (req, res, next) => {
     const { userId } = req.params
 
     let isOwner = false
-    if (userId === req.userId) {
+    if (userId === req.user._id) {
         isOwner = true
     }
 

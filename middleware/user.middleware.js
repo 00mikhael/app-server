@@ -4,7 +4,7 @@ const checkFindUserDetails = async (req, res, next) => {
     const { userId } = req.params
 
     let isOwner = false
-    if (userId === req.userId) {
+    if (userId === req.user._id) {
         isOwner = true
     }
 
@@ -21,7 +21,7 @@ const checkUpdateDetails = async (req, res, next) => {
     let isOwner = false
     const { userId } = req.params
 
-    if (userId === req.userId) {
+    if (userId === req.user._id) {
         isOwner = true
     }
 
@@ -32,6 +32,7 @@ const checkUpdateDetails = async (req, res, next) => {
     }
 
     if (Object.keys(req.body) <= 0) {
+        console.log(req.body)
         return res.status(400).send({
             message: 'Incomplete data'
         })

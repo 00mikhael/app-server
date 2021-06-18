@@ -3,6 +3,10 @@ const router = require('express').Router()
 const { auth, userValidator } = require('../middleware')
 const userController = require('../controllers/user.controller')
 
+router.get('/', auth.denyAccess)
+
+router.delete('/', auth.denyAccess)
+
 router.post(
     '/register',
     [
@@ -14,6 +18,8 @@ router.post(
 )
 
 router.post('/login', [userValidator.checkLoginDetails], userController.login)
+
+router.post('/logout', userController.logout)
 
 router.post('/refreshToken', userController.refreshToken)
 
@@ -27,21 +33,17 @@ router.post('/cancelPasswordReset', userController.cancelPasswordReset)
 
 router.post('/resetPassword', userController.resetPassword)
 
-router.get(
-    '/:userId',
-    [auth.verifyToken, userValidator.checkFindUserDetails],
-    userController.getUser
-)
+router.get('/user', userController.getUser)
 
 router.put(
     '/:userId',
-    [auth.verifyToken, userValidator.checkUpdateDetails],
+    [userValidator.checkUpdateDetails],
     userController.updateUser
 )
 
 router.delete(
     '/:userId',
-    [auth.verifyToken, userValidator.checkFindUserDetails],
+    [userValidator.checkFindUserDetails],
     userController.deleteUser
 )
 

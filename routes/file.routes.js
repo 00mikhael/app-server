@@ -1,8 +1,7 @@
-const router = require('express').Router();
+const router = require('express').Router()
 
-const { auth, upload } = require('../middleware');
+const { auth, upload } = require('../middleware')
 
+router.post('/upload', [auth.isAdmin], upload)
 
-router.post('/upload', [auth.verifyToken, auth.isAdmin], upload);
-
-module.exports = router;
+module.exports = router

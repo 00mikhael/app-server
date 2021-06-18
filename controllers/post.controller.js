@@ -9,8 +9,8 @@ const getPagination = (page, size) => {
 
 exports.create = async (req, res) => {
     const post = new req.db.Post({
-        creator_id: req.userId,
-        creator_name: req.body.creator_name || req.username,
+        creator_id: req.user._id,
+        creator_name: req.body.creator_name || req.user.username,
         title: req.body.title,
         description: req.body.description,
         favorites: [],
@@ -72,7 +72,7 @@ exports.findAllByUser = async (req, res) => {
 
     await req.db.Post.paginate(
         {
-            creator_id: userId || req.userId
+            creator_id: userId || req.user._id
         },
         {
             offset,
@@ -167,7 +167,7 @@ exports.deleteAllByUser = async (req, res) => {
     const { userId } = req.params
 
     await req.db.Post.deleteMany({
-        creator_id: userId || req.userId
+        creator_id: userId || req.user._id
     })
         .then(async data => {
             res.status(200).send({
