@@ -38,7 +38,7 @@
         "validator": "^13.6.0"
     },
     "scripts": {
-        "start": "pm2 start ./bin/www -i 0",
+        "start": "pm2 start ./bin/www",
         "test": ""
     }
 }
