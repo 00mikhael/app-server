@@ -121,7 +121,6 @@ exports.login = async (req, res) => {
             let authority = `ROLE_${user.role.name}`.toUpperCase()
 
             res.cookie('refreshToken', refreshToken, {
-                secure: true,
                 httpOnly: true,
                 sameSite: 'none'
             })
