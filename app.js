@@ -42,6 +42,7 @@ app.use(
         credentialsRequired: false
     }).unless({
         path: [
+            { url: '/', method: 'GET' },
             { url: '/api/', method: 'GET' },
             { url: '/api/posts', method: 'GET' },
             { url: '/api/posts/:postId', method: 'GET' },
