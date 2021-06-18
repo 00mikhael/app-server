@@ -160,8 +160,7 @@ exports.login = async (req, res) => {
 
             res.cookie('refreshToken', refreshToken, {
                 secure: true,
-                sameSite: 'none',
-                domain: '.vercel.app'
+                sameSite: 'none'
             })
 
             res.status(200).send({
