@@ -159,8 +159,9 @@ exports.login = async (req, res) => {
             let authority = `ROLE_${user.role.name}`.toUpperCase()
 
             res.cookie('refreshToken', refreshToken, {
-                httpOnly: true,
-                sameSite: 'none'
+                secure: true,
+                sameSite: 'none',
+                domain: '.vercel.app'
             })
 
             res.status(200).send({
