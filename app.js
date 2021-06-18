@@ -24,6 +24,7 @@ const db = async _ => {
 }
 db()
 
+app.set('trust proxy', 1)
 app.use(
     cors({
         origin: appUrl
