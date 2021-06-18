@@ -31,7 +31,6 @@ app.use(
     })
 )
 
-app.use(helmet())
 app.use(logger(`${app.get('env') === 'production' ? 'combined' : 'dev'}`))
 app.use(express.json())
 app.use(cookieParser())
