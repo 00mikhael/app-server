@@ -122,7 +122,7 @@ exports.login = async (req, res) => {
 
             res.cookie('refreshToken', refreshToken, {
                 secure: true,
-                sameSite: 'none'
+                sameSite: 'None'
             })
 
             res.status(200).send({
