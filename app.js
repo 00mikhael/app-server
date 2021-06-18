@@ -1,7 +1,6 @@
 require('dotenv').config()
 const express = require('express')
 const logger = require('morgan')
-const helmet = require('helmet')
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
 const expressJwt = require('express-jwt')
@@ -24,7 +23,6 @@ const db = async _ => {
 }
 db()
 
-app.set('trust proxy', 1)
 app.use(
     cors({
         origin: appUrl
