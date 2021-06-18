@@ -95,7 +95,7 @@ exports.register = async (req, res) => {
 }
 
 exports.login = async (req, res) => {
-    const requestToken = req.cookies.refreshToken
+    const requestToken = req.cookies?.refreshToken || req.headers?.refreshtoken
 
     await req.db.User.findOne({
         username: req.body.username
@@ -170,6 +170,7 @@ exports.login = async (req, res) => {
                 favoritePosts: user.favoritePosts,
                 role: authority,
                 accessToken,
+                refreshToken,
                 jwtExp
             })
             return

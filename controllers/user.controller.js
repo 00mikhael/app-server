@@ -64,7 +64,7 @@ exports.register = async (req, res) => {
 }
 
 exports.login = async (req, res) => {
-    const requestToken = req.cookies.refreshToken
+    const requestToken = req.cookies?.refreshToken || req.headers?.refreshtoken
 
     await req.db.User.findOne({
         username: req.body.username
@@ -120,7 +120,10 @@ exports.login = async (req, res) => {
 
             let authority = `ROLE_${user.role.name}`.toUpperCase()
 
-            res.cookie('refreshToken', refreshToken)
+            res.cookie('refreshToken', refreshToken, {
+                secure: true,
+                sameSite: 'None'
+            })
 
             res.status(200).send({
                 _id: user._id,
@@ -129,13 +132,14 @@ exports.login = async (req, res) => {
                 favoritePosts: user.favoritePosts,
                 role: authority,
                 accessToken,
+                refreshToken,
                 jwtExp
             })
         })
 }
 
 exports.logout = async (req, res) => {
-    const requestToken = req.cookies.refreshToken
+    const requestToken = req.cookies?.refreshToken || req.headers?.refreshtoken
 
     if (!requestToken) {
         res.status(400).send({
@@ -231,7 +235,7 @@ exports.deleteUser = async (req, res) => {
 }
 
 exports.refreshToken = async (req, res) => {
-    const requestToken = req.cookies.refreshToken
+    const requestToken = req.cookies?.refreshToken || req.headers?.refreshtoken
 
     if (!requestToken) {
         res.status(403).send({

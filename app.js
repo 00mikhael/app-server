@@ -49,6 +49,7 @@ app.use(
             { url: '/api/users/register', method: 'POST' },
             { url: '/api/users/login', method: 'POST' },
             { url: '/api/admin/login', method: 'POST' },
+            { url: '/api/users/logout', method: 'POST' },
             { url: '/api/users/refreshToken', method: 'POST' },
             { url: '/api/users/forgotPassword', method: 'POST' },
             { url: '/api/users/resetPassword', method: 'POST' },
