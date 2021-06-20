@@ -30,7 +30,7 @@ exports.create = async (req, res) => {
         })
 }
 
-exports.findAllPublished = async (req, res) => {
+exports.findAll = async (req, res) => {
     const { page, size, title } = req.query
     const { limit, offset } = getPagination(page, size)
     const condition = title
@@ -38,12 +38,9 @@ exports.findAllPublished = async (req, res) => {
               title: {
                   $regex: new RegExp(title),
                   $options: 'i'
-              },
-              published: true
+              }
           }
-        : {
-              published: true
-          }
+        : {}
 
     await req.db.Post.paginate(condition, {
         offset,

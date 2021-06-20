@@ -10,7 +10,7 @@ router.delete('/', auth.denyAccess)
 router.post('/', [postValidator.checkCreateDetails], postController.create)
 
 // Retrieve all published posts
-router.get('/', postController.findAllPublished)
+router.get('/', postController.findAll)
 
 router.get('/user', auth.denyAccess)
 
