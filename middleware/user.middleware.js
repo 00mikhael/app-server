@@ -125,7 +125,7 @@ const checkUserExist = async (req, res, next) => {
             }
 
             if (user) {
-                res.status(400).send({
+                res.status(404).send({
                     message: 'Email already in use'
                 })
                 return
@@ -148,7 +148,7 @@ const checkRolesExist = async (req, res, next) => {
         }
 
         if (!req.db.ROLES.includes(role.toLowerCase())) {
-            res.status(400).send({
+            res.status(404).send({
                 message: `Invalid role`
             })
             return
@@ -172,7 +172,7 @@ const checkEmailExist = async (req, res, next) => {
             }
 
             if (!user) {
-                res.status(400).send({
+                res.status(404).send({
                     message: 'An error occurred'
                 })
                 return
@@ -195,7 +195,7 @@ const checkEmailExist = async (req, res, next) => {
         }
 
         if (!user) {
-            res.status(400).send({
+            res.status(404).send({
                 message: 'An error occurred'
             })
             return
