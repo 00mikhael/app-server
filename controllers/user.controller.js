@@ -7,7 +7,6 @@ const { TokenExpiredError } = jwt
 
 const jwtSecret = process.env.JWT_SECRET
 const jwtExp = Number(process.env.JWT_EXP)
-const jwtRefreshExp = Number(process.env.JWT_REFRESH_EXP)
 const appUrl = process.env.APP_URL
 const bcryptSalt = Number(process.env.BCRYPT_SALT)
 
@@ -303,9 +302,17 @@ exports.refreshToken = async (req, res) => {
 }
 
 exports.forgotPassword = async (req, res) => {
-    const { email } = req.body
+    const { email, username } = req.body
 
-    const user = await req.db.User.findOne({ email })
+    let user = null
+
+    if (email) {
+        user = await req.db.User.findOne({ email })
+    }
+
+    if (username) {
+        user = await req.db.User.findOne({ username })
+    }
 
     if (!user) {
         res.status(404).send({
@@ -324,8 +331,9 @@ exports.forgotPassword = async (req, res) => {
         token: hash,
         createdAt: Date.now()
     }).save()
-    const resetLink = `${appUrl}/users/resetPassword?resetToken=${resetToken}&id=${user._id}`
-    const cancelResetLink = `${appUrl}/users/cancelPasswordReset?resetToken=${resetToken}&id=${user._id}`
+
+    const resetLink = `${appUrl}/resetPassword/${resetToken}/${user._id}`
+    const cancelResetLink = `${appUrl}/cancelPasswordReset/${resetToken}/${user._id}`
     sendEmail(
         user.email,
         'Password Reset Request',
@@ -359,7 +367,6 @@ exports.cancelPasswordReset = async (req, res) => {
     res.status(200).send({
         message: 'Password reset canceled'
     })
-
     return
 }
 

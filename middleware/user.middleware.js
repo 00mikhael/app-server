@@ -160,9 +160,33 @@ const checkRolesExist = async (req, res, next) => {
 }
 
 const checkEmailExist = async (req, res, next) => {
-    const { email } = req.body
+    const { email, username } = req.body
 
-    await req.db.User.findOne({ email: email }).exec(async (err, user) => {
+    if (email) {
+        await req.db.User.findOne({ email }).exec(async (err, user) => {
+            if (err) {
+                res.status(404).send({
+                    message: err
+                })
+                return
+            }
+
+            if (!user) {
+                res.status(400).send({
+                    message: 'An error occurred'
+                })
+                return
+            }
+
+            next()
+        })
+    }
+
+    if (email) {
+        return
+    }
+
+    await req.db.User.findOne({ username }).exec(async (err, user) => {
         if (err) {
             res.status(404).send({
                 message: err
